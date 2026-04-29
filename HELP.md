@@ -20,7 +20,7 @@ A backend system for job posting and application management, built with Spring B
 
 ## 📊 Database Design
 
-
+![Screenshot 2026-04-29 153545.png](docs/Screenshot%202026-04-29%20153545.png)
 
 ## 🔧 Setup
 
