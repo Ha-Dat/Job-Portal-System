@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Job Portal</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .card {
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            transition: transform 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Create Account</h2>
+                    <p class="text-center text-muted mb-4">Join us and find your dream job</p>
+
+                    <!-- Register Form -->
+                    <form th:action="@{/register}" th:object="${registerRequest}" method="post">
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text"
+                                   class="form-control"
+                                   th:field="*{fullName}"
+                                   id="fullName"
+                                   placeholder="John Doe">
+                            <div th:if="${#fields.hasErrors('fullName')}"
+                                 class="text-danger small mt-1"
+                                 th:errors="*{fullName}"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email"
+                                   class="form-control"
+                                   th:field="*{email}"
+                                   id="email"
+                                   placeholder="name@example.com">
+                            <div th:if="${#fields.hasErrors('email')}"
+                                 class="text-danger small mt-1"
+                                 th:errors="*{email}"></div>
+                            <div class="form-text">We'll never share your email with anyone else.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password"
+                                   class="form-control"
+                                   th:field="*{password}"
+                                   id="password"
+                                   placeholder="Create a password">
+                            <div th:if="${#fields.hasErrors('password')}"
+                                 class="text-danger small mt-1"
+                                 th:errors="*{password}"></div>
+                            <div class="form-text">Password must be at least 6 characters.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password"
+                                   class="form-control"
+                                   th:field="*{confirmPassword}"
+                                   id="confirmPassword"
+                                   placeholder="Confirm your password">
+                            <div th:if="${passwordError}"
+                                 class="text-danger small mt-1"
+                                 th:text="${passwordError}"></div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mb-3">Create Account</button>
+
+                        <hr class="my-4">
+
+                        <div class="text-center">
+                            <p class="mb-0">Already have an account?
+                                <a href="/login" class="text-decoration-none fw-bold">Sign In</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/webjars/jquery/3.6.4/jquery.min.js"></script>
+<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<!-- Password match validation -->
+<script>
+    $(document).ready(function() {
+        $('#confirmPassword').on('keyup', function() {
+            var password = $('#password').val();
+            var confirmPassword = $(this).val();
+            if (password !== confirmPassword) {
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+    });
+</script>
+</body>
+</html>
