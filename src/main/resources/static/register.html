@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Job Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .register-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        input.error {
+            border-color: #dc3545;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: none;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        .requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .requirements ul {
+            margin-left: 20px;
+            margin-top: 5px;
+        }
+        .password-match {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .password-match.valid {
+            color: #28a745;
+        }
+        .password-match.invalid {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <h1>Create Account ✨</h1>
+    <p class="subtitle">Join us and find your dream job</p>
+
+    <form id="registerForm">
+        <div class="input-group">
+            <label>👤 Full Name</label>
+            <input type="text" id="fullName" placeholder="John Doe" required>
+        </div>
+
+        <div class="input-group">
+            <label>📧 Email Address</label>
+            <input type="email" id="email" placeholder="name@example.com" required>
+        </div>
+
+        <div class="input-group">
+            <label>🔒 Password</label>
+            <input type="password" id="password" placeholder="Create a password" required>
+            <div class="requirements">
+                • Password must be at least 6 characters
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>✓ Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+            <div id="passwordMatchMessage" class="password-match"></div>
+        </div>
+
+        <button type="submit" id="submitBtn">Create Account →</button>
+    </form>
+
+    <div id="message" class="message"></div>
+
+    <div class="login-link">
+        Already have an account? <a href="/login.html">Sign In</a>
+    </div>
+</div>
+
+<script>
+    const API_BASE = '/api/auth';
+
+    const fullNameInput = document.getElementById('fullName');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const passwordMatchMessage = document.getElementById('passwordMatchMessage');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Real-time password match validation
+    function validatePasswordMatch() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (confirmPassword.length === 0) {
+            passwordMatchMessage.textContent = '';
+            passwordMatchMessage.className = 'password-match';
+            return false;
+        }
+
+        if (password === confirmPassword) {
+            passwordMatchMessage.textContent = '✓ Passwords match';
+            passwordMatchMessage.className = 'password-match valid';
+            return true;
+        } else {
+            passwordMatchMessage.textContent = '✗ Passwords do not match';
+            passwordMatchMessage.className = 'password-match invalid';
+            return false;
+        }
+    }
+
+    passwordInput.addEventListener('keyup', validatePasswordMatch);
+    confirmPasswordInput.addEventListener('keyup', validatePasswordMatch);
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const fullName = fullNameInput.value.trim();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        const messageDiv = document.getElementById('message');
+        messageDiv.style.display = 'none';
+
+        // Validation
+        if (!fullName || !email || !password || !confirmPassword) {
+            showMessage('❌ Please fill in all fields', 'error');
+            return;
+        }
+
+        if (password.length < 6) {
+            showMessage('❌ Password must be at least 6 characters', 'error');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            showMessage('❌ Passwords do not match', 'error');
+            return;
+        }
+
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating account...';
+        showMessage('Creating your account...', 'success');
+
+        try {
+            const response = await fetch(`${API_BASE}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullName,
+                    email,
+                    password,
+                    confirmPassword
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Success
+                showMessage('✅ Registration successful! Redirecting to login...', 'success');
+
+                // Save token if you want auto-login
+                localStorage.setItem('jwt_token', data.token);
+
+                // Redirect to login page after 1.5 seconds
+                setTimeout(() => {
+                    window.location.href = `/login.html?email=${encodeURIComponent(email)}`;
+                }, 1500);
+            } else {
+                // Error
+                showMessage(`❌ ${data.error || 'Registration failed'}`, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account →';
+            }
+        } catch (error) {
+            showMessage(`❌ Network error: ${error.message}`, 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Account →';
+        }
+    });
+
+    function showMessage(msg, type) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.textContent = msg;
+        messageDiv.className = `message ${type}`;
+        messageDiv.style.display = 'block';
+
+        if (type === 'success') {
+            setTimeout(() => {
+                if (messageDiv.textContent === msg) {
+                    // Keep visible if redirect is coming
+                }
+            }, 1000);
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Job Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: none;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+        .token-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        .token-info.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .token-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 13px;
+        }
+        .token-value {
+            font-family: monospace;
+            font-size: 11px;
+            word-break: break-all;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .copy-btn {
+            background: #667eea;
+            padding: 8px;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        .user-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .user-info p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        .user-info strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h1>Welcome Back! 👋</h1>
+    <p class="subtitle">Sign in to your account to continue</p>
+
+    <form id="loginForm">
+        <div class="input-group">
+            <label>📧 Email Address</label>
+            <input type="email" id="email" placeholder="name@example.com" required>
+        </div>
+
+        <div class="input-group">
+            <label>🔒 Password</label>
+            <input type="password" id="password" placeholder="Enter your password" required>
+        </div>
+
+        <button type="submit">Sign In →</button>
+    </form>
+
+    <div id="message" class="message"></div>
+
+    <div id="tokenInfo" class="token-info">
+        <div class="token-label">🔑 Your JWT Token:</div>
+        <div class="token-value" id="tokenValue"></div>
+        <button onclick="copyToken()" class="copy-btn">📋 Copy Token</button>
+
+        <div class="user-info" id="userInfo"></div>
+    </div>
+
+    <div class="register-link">
+        Don't have an account? <a href="/register.html">Create Account</a>
+    </div>
+</div>
+
+<script>
+    const API_BASE = '/api/auth';
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // Clear previous messages
+        const messageDiv = document.getElementById('message');
+        messageDiv.style.display = 'none';
+        document.getElementById('tokenInfo').classList.remove('show');
+
+        // Show loading
+        messageDiv.textContent = 'Logging in...';
+        messageDiv.className = 'message success';
+        messageDiv.style.display = 'block';
+
+        try {
+            const response = await fetch(`${API_BASE}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Success
+                messageDiv.textContent = '✅ Login successful!';
+                messageDiv.className = 'message success';
+
+                // Display token
+                document.getElementById('tokenValue').textContent = data.token;
+
+                // Display user info
+                const userInfoDiv = document.getElementById('userInfo');
+                userInfoDiv.innerHTML = `
+                        <p><strong>👤 Name:</strong> ${data.fullName}</p>
+                        <p><strong>📧 Email:</strong> ${data.email}</p>
+                        <p><strong>🎭 Role:</strong> ${data.role}</p>
+                    `;
+
+                document.getElementById('tokenInfo').classList.add('show');
+
+                // Save to localStorage
+                localStorage.setItem('jwt_token', data.token);
+                localStorage.setItem('user_email', data.email);
+                localStorage.setItem('user_name', data.fullName);
+                localStorage.setItem('user_role', data.role);
+
+                // Optional: Redirect after 2 seconds
+                // setTimeout(() => window.location.href = '/dashboard.html', 2000);
+            } else {
+                // Error
+                messageDiv.textContent = `❌ ${data.error || 'Login failed'}`;
+                messageDiv.className = 'message error';
+            }
+        } catch (error) {
+            messageDiv.textContent = `❌ Network error: ${error.message}`;
+            messageDiv.className = 'message error';
+        }
+    });
+
+    function copyToken() {
+        const token = document.getElementById('tokenValue').textContent;
+        navigator.clipboard.writeText(token).then(() => {
+            alert('✓ Token copied to clipboard!');
+        });
+    }
+
+    // Auto-fill if coming from register page
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('email')) {
+        document.getElementById('email').value = urlParams.get('email');
+    }
+</script>
+</body>
+</html>

@@ -64,4 +64,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "job_id")
     )
     private List<Job> favoriteJobs = new ArrayList<>();
+
+    public <T> User(String email, String password, List<T> ts) {
+    }
 }
