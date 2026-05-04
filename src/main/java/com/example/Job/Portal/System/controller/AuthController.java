@@ -6,6 +6,7 @@ import com.example.Job.Portal.System.entity.User;
 import com.example.Job.Portal.System.enums.Role;
 import com.example.Job.Portal.System.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -73,5 +74,10 @@ public class AuthController {
         userService.save(user);
 
         return "redirect:/login?success=true";
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        return ResponseEntity.ok("Logged out successfully");
     }
 }
