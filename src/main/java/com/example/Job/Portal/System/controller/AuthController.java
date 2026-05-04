@@ -67,7 +67,7 @@ public class AuthController {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setFullName(registerRequest.getFullName());
-        user.setRole(Role.USER);
+        user.setRole(Role.JOB_SEEKER);
 
         // Save user
         userService.save(user);
